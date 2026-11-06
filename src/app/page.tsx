@@ -1,69 +1,106 @@
-import Image from "next/image";
+import Link from "next/link";
+import { FiArrowRight } from "react-icons/fi";
+import Hero from "@/components/Hero";
+import Stats from "@/components/Stats";
+import Expertise from "@/components/Expertise";
+import Capabilities from "@/components/Capabilities";
+import { TechMarquee } from "@/components/Marquees";
+import PartnersSection from "@/components/PartnersSection";
+import Process from "@/components/Process";
+import ProjectShowcase from "@/components/ProjectShowcase";
+import Testimonials from "@/components/Testimonials";
+import BlogCard from "@/components/BlogCard";
+import MobileCarousel from "@/components/MobileCarousel";
+import FAQ from "@/components/FAQ";
+import CTA from "@/components/CTA";
+import { Reveal, Section, SectionHeading } from "@/components/ui";
+import { getPartners, getPosts, getProjects, getTestimonials } from "@/lib/storyblok";
+import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import { pageMeta } from "@/lib/seo";
+import { faqs } from "@/data/site";
 
-export default function Home() {
+export const metadata: Metadata = pageMeta({
+  title: "Uptick Tech — Web Apps, SaaS & Custom Software Company",
+  description: "Uptick Tech builds scalable web applications, SaaS platforms, dashboards, ERP and custom software with Next.js and the MERN stack. Based in Malappuram, Kerala.",
+  path: "/",
+  absoluteTitle: true,
+});
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+};
+
+export default async function Home() {
+  const [projects, partners, testimonials, posts] = await Promise.all([
+    getProjects(),
+    getPartners(),
+    getTestimonials(),
+    getPosts(),
+  ]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <>
+      <JsonLd data={faqLd} />
+      <Hero />
+      <Stats />
+      <Expertise />
+
+      <Section id="services">
+        <SectionHeading
+          eyebrow="What we do"
+          title={<>Solutions built for <span className="text-gradient">growth</span></>}
+          sub="End-to-end engineering — strategy, design, development and deployment under one roof."
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <Capabilities />
+      </Section>
+      <PartnersSection partners={partners} />
+
+      {projects.length > 0 && <ProjectShowcase projects={projects} />}
+
+      <Section id="process" soft>
+        <SectionHeading eyebrow="How we work" title={<>A process built on <span className="text-gradient">clarity</span></>} />
+        <Process />
+      </Section>
+
+      <Section id="tech" className="overflow-hidden">
+        <SectionHeading eyebrow="Tech stack" title={<>Modern tools, <span className="text-gradient">proven</span> in production</>} />
+        <TechMarquee />
+      </Section>
+
+      {testimonials.length > 0 && (
+        <Section soft>
+          <SectionHeading eyebrow="Testimonials" title={<>What our <span className="text-gradient">clients</span> say</>} />
+          <Testimonials items={testimonials.slice(0, 3)} />
+        </Section>
+      )}
+
+      {posts.length > 0 && (
+      <Section>
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading align="left" eyebrow="Insights" title={<>Latest from the <span className="text-gradient">blog</span></>} />
+          <Reveal className="mb-10">
+            <Link href="/blog" className="inline-flex items-center gap-2 font-semibold text-brand">All articles <FiArrowRight /></Link>
+          </Reveal>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="-mx-6 md:mx-0">
+          <MobileCarousel desktopClassName="md:grid-cols-3 md:gap-6">
+            {[...posts].reverse().slice(0, 3).map((p) => (
+              <BlogCard key={p.slug} post={p} />
+            ))}
+          </MobileCarousel>
         </div>
-      </main>
-    </div>
+      </Section>
+      )}
+
+      <Section soft id="faq">
+        <SectionHeading eyebrow="FAQs" title={<>Questions? <span className="text-gradient">Answered.</span></>} />
+        <FAQ />
+      </Section>
+
+      <CTA />
+    </>
   );
 }
